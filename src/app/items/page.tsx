@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import AddItemForm from "./AddItemForm";
 import ItemCard, { type Item } from "./ItemCard";
+import DangerZone from "./DangerZone";
 
 export default async function ItemsPage() {
   const supabase = await createClient();
@@ -74,6 +75,8 @@ export default async function ItemsPage() {
             ))}
           </Stack>
         )}
+
+        <DangerZone hasItems={list.length > 0} />
       </Box>
     </Container>
   );

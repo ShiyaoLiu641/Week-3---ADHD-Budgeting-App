@@ -75,3 +75,33 @@ export async function deleteItem(formData: FormData) {
   await supabase.from("items").delete().eq("id", id);
   revalidatePath("/items");
 }
+
+// US-4.2 — Delete all of the user's data. Destructive, so the UI confirms first.
+export type DeleteAllState = { error?: string; ok?: number };
+
+export async function deleteAllItems(
+  _prev: DeleteAllState,
+  _formData: FormData
+): Promise<DeleteAllState> {
+  const supabase = await createClient();
+
+  // Check on the server that someone is logged in (never trust the UI alone).
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: "Your session ended. Please log in again." };
+  }
+
+  // Scope the delete to this user. Row Level Security enforces it too.
+  const { error } = await supabase.from("items").delete().eq("user_id", user.id);
+
+  if (error) {
+    // Log the real reason for us; show the user a plain message.
+    console.error("deleteAllItems failed:", error);
+    return { error: "Could not delete your data. Please try again." };
+  }
+
+  revalidatePath("/items");
+  return { ok: Date.now() };
+}
