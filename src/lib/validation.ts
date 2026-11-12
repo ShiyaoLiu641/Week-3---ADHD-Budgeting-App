@@ -13,9 +13,7 @@ export type Decision = (typeof DECISIONS)[number];
  * Given a name, When we check it, Then empty / spaces-only is NOT allowed.
  */
 export function isValidItemName(name: string): boolean {
-  // DELIBERATE BUG (Week 5 demo): always returns true, so an empty name
-  // would wrongly be accepted. This should make the Vitest "test" check FAIL.
-  return true;
+  return name.trim().length > 0;
 }
 
 /**
