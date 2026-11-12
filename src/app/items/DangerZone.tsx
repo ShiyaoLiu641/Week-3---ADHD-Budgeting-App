@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useState } from "react";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
@@ -16,16 +16,16 @@ import { deleteAllItems, type DeleteAllState } from "./actions";
 const initialState: DeleteAllState = {};
 
 export default function DangerZone({ hasItems }: { hasItems: boolean }) {
-  const [open, setOpen] = useState(false);
+  const [wantOpen, setWantOpen] = useState(false);
   const [state, formAction, pending] = useActionState(
     deleteAllItems,
     initialState
   );
 
-  // Close the dialog once the data is actually deleted.
-  useEffect(() => {
-    if (state.ok) setOpen(false);
-  }, [state]);
+  // Show the dialog when the user asked for it, but close it automatically
+  // once the delete has succeeded (state.ok). Derived, so no effect needed.
+  const open = wantOpen && !state.ok;
+  const setOpen = setWantOpen;
 
   return (
     <Box sx={{ mt: 6 }}>

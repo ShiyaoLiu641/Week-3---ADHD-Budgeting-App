@@ -2,6 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import {
+  isValidItemName,
+  isValidLink,
+  isValidDecision,
+  revisitDateFromDays,
+} from "@/lib/validation";
 
 export type ItemFormState = { error?: string; ok?: number };
 
@@ -16,8 +22,13 @@ export async function createItem(
   const revisitDays = String(formData.get("revisitDays") ?? "").trim();
 
   // Keep the user's typed input and show a plain message if name is empty.
-  if (!name) {
+  if (!isValidItemName(name)) {
     return { error: "Please type what you want to park." };
+  }
+
+  // If a link was typed, it must be a real web address.
+  if (!isValidLink(link)) {
+    return { error: "That link doesn't look like a web address (it should start with http:// or https://)." };
   }
 
   const supabase = await createClient();
@@ -29,13 +40,7 @@ export async function createItem(
   }
 
   // Turn "wait N days" into an actual date, if chosen.
-  let revisit_at: string | null = null;
-  const days = Number(revisitDays);
-  if (revisitDays && !Number.isNaN(days) && days > 0) {
-    const d = new Date();
-    d.setDate(d.getDate() + days);
-    revisit_at = d.toISOString();
-  }
+  const revisit_at = revisitDateFromDays(revisitDays);
 
   const { error } = await supabase.from("items").insert({
     user_id: user.id,
@@ -57,8 +62,7 @@ export async function createItem(
 export async function setDecision(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   const decision = String(formData.get("decision") ?? "");
-  const allowed = ["buy", "let_go", "still_deciding"];
-  if (!id || !allowed.includes(decision)) return;
+  if (!id || !isValidDecision(decision)) return;
 
   const supabase = await createClient();
   // Row Level Security makes sure a user can only change their own rows.
