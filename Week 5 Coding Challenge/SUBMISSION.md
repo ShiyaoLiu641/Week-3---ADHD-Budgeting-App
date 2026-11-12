@@ -57,8 +57,8 @@ WRITE THIS YOURSELF — no AI. At least 2 paragraphs. Ideas:
 - [x] At least 3 new CI checks (we have 5: lint, typecheck, test, skills, build)
 - [x] Week 1 Claude Skills are gate-checked on every push
 - [x] Broke something on purpose, pushed it, confirmed the pipeline caught it
-- [ ] Ran both manual test scenarios on the live app and wrote down the results
-- [ ] Live app still works after the changes
+- [x] Ran both manual test scenarios on the live app and wrote down the results (both Pass — see `test-cases.md`)
+- [x] Live app still works after the changes
 - [ ] Filled in "What I Did" and "What I Learned" (by me, not AI)
 - [ ] Merged the pull request into main
 - [ ] Emailed mdenner@techfleet.org with the repo link

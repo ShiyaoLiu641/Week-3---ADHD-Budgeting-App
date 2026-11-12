@@ -1,36 +1,63 @@
 # Week 5 — Manual Test Case Scenarios
 
-Two test cases, run **by hand** on the live app:
+Two scenarios, run **by hand** on the live app:
 https://week-3-adhd-budgeting-app-three.vercel.app/
 
-> How to use: do the steps yourself in the live app, then write what actually
-> happened in the **Actual Result** row, and mark Pass / Fail.
-> (If the app looks asleep, open the Supabase dashboard and click **Resume project** first.)
+Each has its **BDD scenario** (Given / When / Then) and a **test case**
+(pre-conditions, steps, expected result, actual result).
+
+> If the app looks asleep, open the Supabase dashboard and click **Resume project** first.
 
 ---
 
-## TC-1 — Park an item (happy path)
+## TC-1 — Park an item (Happy Path)
 
-Maps to BDD: *Given a logged-in user, When they submit an item with a name, Then it is saved and shown in the list.*
+### BDD scenario
+
+```
+GIVEN I am a logged-in user of Park & Revisit
+  AND I am on the items page
+  AND the "Park an item" form is visible
+WHEN I type a name in "What are you tempted to buy?" (e.g. "a new water bottle")
+  AND I optionally paste a product link
+  AND I click "Park it"
+THEN the item is saved
+  AND it appears in my list with the name I typed
+  AND no error message is shown
+```
+
+### Test case
 
 | Field | Detail |
 |---|---|
-| **Pre-conditions** | You are logged in. You are on the `/items` page. |
-| **Steps** | 1. In the "park an item" form, type a name, e.g. `Standing desk`.<br>2. (Optional) paste a real link, e.g. `https://www.amazon.com`.<br>3. Click the button to park it. |
-| **Expected Result** | The item appears in your list with the name you typed. No error message. |
-| **Actual Result** | _(write what happened after you ran it)_ |
-| **Status** | ☐ Pass  ☐ Fail |
+| **Pre-conditions** | Logged in; on the `/items` page. |
+| **Steps** | 1. Type a name, e.g. `a new water bottle`.<br>2. (Optional) paste a link.<br>3. Click **Park it**. |
+| **Expected Result** | The item appears in the list with the name typed; no error. |
+| **Actual Result** | The item was saved and appeared in the list (e.g. "a new water bottle", "Zara Jacket"), with working decision buttons (Buy / Let go / Still deciding). No error shown. |
+| **Status** | ☑ **Pass**  ☐ Fail |
 
 ---
 
-## TC-2 — Empty name is rejected
+## TC-2 — Empty name is rejected (Negative Path)
 
-Maps to BDD: *Given a logged-in user, When they submit an item with a blank name, Then it is NOT saved and a clear message is shown.*
+### BDD scenario
+
+```
+GIVEN I am a logged-in user of Park & Revisit
+  AND I am on the items page
+  AND the name field ("What are you tempted to buy?") is empty
+WHEN I click "Park it"
+THEN the item is NOT saved
+  AND a message "Please type what you want to park." is shown
+  AND nothing is added to my list
+```
+
+### Test case
 
 | Field | Detail |
 |---|---|
-| **Pre-conditions** | You are logged in. You are on the `/items` page. |
-| **Steps** | 1. Leave the name field empty (or type only spaces).<br>2. Click the button to park it. |
-| **Expected Result** | Nothing is added to the list. A plain message appears asking you to type what you want to park. |
-| **Actual Result** | _(write what happened after you ran it)_ |
-| **Status** | ☐ Pass  ☐ Fail |
+| **Pre-conditions** | Logged in; on the `/items` page; name field left empty. |
+| **Steps** | 1. Leave the name field empty (or type only spaces).<br>2. Click **Park it**. |
+| **Expected Result** | Nothing is added; a clear message asks you to type what you want to park. |
+| **Actual Result** | The message "Please type what you want to park." appeared and no item was added to the list. |
+| **Status** | ☑ **Pass**  ☐ Fail |
