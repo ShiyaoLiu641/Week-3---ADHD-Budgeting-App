@@ -52,6 +52,7 @@ export default async function LoginPage({
                 required
                 autoComplete="email"
                 fullWidth
+                slotProps={{ inputLabel: { shrink: true } }}
               />
               <TextField
                 label="Password"
@@ -61,6 +62,7 @@ export default async function LoginPage({
                 autoComplete={isSignup ? "new-password" : "current-password"}
                 helperText={isSignup ? "At least 6 characters." : undefined}
                 fullWidth
+                slotProps={{ inputLabel: { shrink: true } }}
               />
               <Button type="submit" variant="contained" size="large">
                 {isSignup ? "Sign up" : "Log in"}

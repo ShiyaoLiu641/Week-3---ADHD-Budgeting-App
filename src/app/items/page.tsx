@@ -29,7 +29,7 @@ export default async function ItemsPage() {
   const list = (items ?? []) as Item[];
 
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth="md">
       <Box sx={{ py: 6 }}>
         <Stack
           direction="row"
@@ -69,11 +69,18 @@ export default async function ItemsPage() {
             </Typography>
           </Paper>
         ) : (
-          <Stack spacing={2}>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+              gap: 2,
+              alignItems: "start",
+            }}
+          >
             {list.map((item) => (
               <ItemCard key={item.id} item={item} />
             ))}
-          </Stack>
+          </Box>
         )}
 
         <DangerZone hasItems={list.length > 0} />
