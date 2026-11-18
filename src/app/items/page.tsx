@@ -7,7 +7,8 @@ import Paper from "@mui/material/Paper";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import AddItemForm from "./AddItemForm";
-import ItemCard, { type Item } from "./ItemCard";
+import { type Item } from "./ItemCard";
+import ItemsBoard from "./ItemsBoard";
 import DangerZone from "./DangerZone";
 
 export default async function ItemsPage() {
@@ -69,18 +70,7 @@ export default async function ItemsPage() {
             </Typography>
           </Paper>
         ) : (
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-              gap: 2,
-              alignItems: "start",
-            }}
-          >
-            {list.map((item) => (
-              <ItemCard key={item.id} item={item} />
-            ))}
-          </Box>
+          <ItemsBoard items={list} />
         )}
 
         <DangerZone hasItems={list.length > 0} />
