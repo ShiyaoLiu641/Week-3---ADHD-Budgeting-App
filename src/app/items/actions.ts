@@ -14,6 +14,7 @@ export async function createItem(
   const link = String(formData.get("link") ?? "").trim();
   const note = String(formData.get("note") ?? "").trim();
   const revisitDays = String(formData.get("revisitDays") ?? "").trim();
+  const revisitDate = String(formData.get("revisitDate") ?? "").trim();
 
   // Keep the user's typed input and show a plain message if name is empty.
   if (!name) {
@@ -28,13 +29,21 @@ export async function createItem(
     return { error: "Your session ended. Please log in again." };
   }
 
-  // Turn "wait N days" into an actual date, if chosen.
+  // Work out the revisit date. A specific calendar date wins; otherwise
+  // turn "wait N days" into a date. Either one is optional.
   let revisit_at: string | null = null;
-  const days = Number(revisitDays);
-  if (revisitDays && !Number.isNaN(days) && days > 0) {
-    const d = new Date();
-    d.setDate(d.getDate() + days);
-    revisit_at = d.toISOString();
+  if (revisitDate) {
+    // "T09:00:00" (no Z) is parsed as local time, avoiding an off-by-one-day
+    // shift from UTC midnight.
+    const d = new Date(`${revisitDate}T09:00:00`);
+    if (!Number.isNaN(d.getTime())) revisit_at = d.toISOString();
+  } else {
+    const days = Number(revisitDays);
+    if (revisitDays && !Number.isNaN(days) && days > 0) {
+      const d = new Date();
+      d.setDate(d.getDate() + days);
+      revisit_at = d.toISOString();
+    }
   }
 
   const { error } = await supabase.from("items").insert({
