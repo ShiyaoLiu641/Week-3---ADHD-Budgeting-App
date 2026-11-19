@@ -9,6 +9,8 @@ import Typography from "@mui/material/Typography";
 import ItemCard, { type Item } from "./ItemCard";
 
 // The four filters. "all" shows everything; the others match a decision.
+// "Still deciding" is the default so the home view shows what still needs
+// attention — and hides items the user has already let go of.
 type Filter = "still_deciding" | "buy" | "let_go" | "all";
 
 const TABS: { value: Filter; label: string }[] = [

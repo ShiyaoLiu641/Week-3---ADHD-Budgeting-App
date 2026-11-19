@@ -49,13 +49,19 @@ const choices: Array<{ value: Item["decision"]; label: string }> = [
 
 export default function ItemCard({ item }: { item: Item }) {
   const revisitText = formatRevisit(item.revisit_at);
+  // "Deciding" means null or still_deciding. Show only the states the user can
+  // switch TO (never the current one): a still-deciding card shows just Buy and
+  // Let go; a decided card shows the other option plus a way back to deciding.
+  const isDecided = item.decision === "buy" || item.decision === "let_go";
+  const current = item.decision ?? "still_deciding";
+  const options = choices.filter((c) => c.value !== current);
 
   return (
     <Paper
       elevation={0}
-      sx={{ p: 3, border: "1px solid", borderColor: "divider" }}
+      sx={{ p: 2, border: "1px solid", borderColor: "divider" }}
     >
-      <Stack spacing={1.5}>
+      <Stack spacing={1}>
         <Stack
           direction="row"
           sx={{ justifyContent: "space-between", alignItems: "flex-start", gap: 1 }}
@@ -63,7 +69,10 @@ export default function ItemCard({ item }: { item: Item }) {
           <Typography variant="h6" component="h3">
             {item.name}
           </Typography>
-          {item.decision ? (
+          {/* Only "Buy" and "Let go" get a chip. "Still deciding" (whether
+              set on purpose or never decided) stays neutral, so the Still
+              deciding list looks consistent and calm. */}
+          {item.decision === "buy" || item.decision === "let_go" ? (
             <Chip
               label={decisionLabels[item.decision]}
               color={decisionColors[item.decision]}
@@ -93,18 +102,27 @@ export default function ItemCard({ item }: { item: Item }) {
         {/* US-3.1 — choose/change a decision. The clicked button submits its value. */}
         <Box>
           <Typography variant="caption" color="text.secondary">
-            Your decision
+            {isDecided ? "Change to" : "Decide"}
           </Typography>
           <Stack direction="row" spacing={1} sx={{ mt: 0.5, flexWrap: "wrap", gap: 1 }}>
-            {choices.map((c) => (
+            {options.map((c) => (
               <form action={setDecision} key={c.value}>
                 <input type="hidden" name="id" value={item.id} />
                 <input type="hidden" name="decision" value={c.value ?? ""} />
                 <Button
                   type="submit"
                   size="small"
-                  variant={item.decision === c.value ? "contained" : "outlined"}
-                  color={c.value ? decisionColors[c.value] : "primary"}
+                  variant="outlined"
+                  color={
+                    c.value === "still_deciding"
+                      ? "inherit"
+                      : decisionColors[c.value as "buy" | "let_go"]
+                  }
+                  sx={
+                    c.value === "still_deciding"
+                      ? { color: "text.secondary", borderColor: "divider" }
+                      : undefined
+                  }
                 >
                   {c.label}
                 </Button>
