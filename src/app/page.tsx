@@ -3,8 +3,13 @@ import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
+import MuiLink from "@mui/material/Link";
+import { getLang } from "@/i18n/server";
+import { t } from "@/i18n/dictionary";
+import LanguageToggle from "@/i18n/LanguageToggle";
 
-export default function Home() {
+export default async function Home() {
+  const lang = await getLang();
   return (
     <Container maxWidth="sm">
       <Box
@@ -17,21 +22,27 @@ export default function Home() {
           py: 6,
         }}
       >
+        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+          <LanguageToggle />
+        </Box>
         <Typography variant="h3" component="h1">
           Park &amp; Revisit
         </Typography>
         <Typography variant="h6" component="p" color="text.secondary">
-          Tempted to buy something? Park it here, take a breath, and decide
-          later — no numbers, no guilt.
+          {t(lang, "home.subtitle")}
         </Typography>
-        <Stack direction="row" spacing={2}>
-          <Button href="/items" variant="contained" size="large">
-            Park an item
-          </Button>
-          <Button href="/login" variant="outlined" size="large">
-            Log in
-          </Button>
-        </Stack>
+        <Box>
+          <Stack direction="row" spacing={2}>
+            <Button href="/login" variant="contained" size="large">
+              {t(lang, "home.cta.login")}
+            </Button>
+          </Stack>
+          <Typography variant="body2" sx={{ mt: 1.5 }}>
+            <MuiLink href="/login?mode=signup">
+              {t(lang, "home.signupLink")}
+            </MuiLink>
+          </Typography>
+        </Box>
       </Box>
     </Container>
   );

@@ -1,3 +1,5 @@
+"use client";
+
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
@@ -6,6 +8,8 @@ import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
 import MuiLink from "@mui/material/Link";
 import { setDecision, deleteItem } from "./actions";
+import { useT } from "@/i18n/LanguageProvider";
+import { type TranslationKey } from "@/i18n/dictionary";
 
 export type Item = {
   id: string;
@@ -17,44 +21,43 @@ export type Item = {
   created_at: string;
 };
 
-const decisionLabels: Record<string, string> = {
-  buy: "Buy",
-  let_go: "Let go",
-  still_deciding: "Still deciding",
-};
-
 const decisionColors: Record<string, "primary" | "success" | "warning"> = {
   buy: "primary",
   let_go: "success",
   still_deciding: "warning",
 };
 
-function formatRevisit(iso: string | null): string | null {
+// Work out which "revisit" message to show, as a dictionary key (plus a number
+// to fill in for the "in N days" case). The component translates it.
+function revisitInfo(
+  iso: string | null
+): { key: TranslationKey; vars?: Record<string, number> } | null {
   if (!iso) return null;
   const when = new Date(iso);
   const now = new Date();
   const dayMs = 24 * 60 * 60 * 1000;
   const days = Math.round((when.getTime() - now.getTime()) / dayMs);
-  if (days > 1) return `Revisit in ${days} days`;
-  if (days === 1) return "Revisit tomorrow";
-  if (days === 0) return "Ready to revisit today";
-  return "Ready to revisit";
+  if (days > 1) return { key: "card.revisit.inDays", vars: { n: days } };
+  if (days === 1) return { key: "card.revisit.tomorrow" };
+  if (days === 0) return { key: "card.revisit.today" };
+  return { key: "card.revisit.ready" };
 }
 
-const choices: Array<{ value: Item["decision"]; label: string }> = [
-  { value: "buy", label: "Buy" },
-  { value: "let_go", label: "Let go" },
-  { value: "still_deciding", label: "Still deciding" },
+const choices: Array<"buy" | "let_go" | "still_deciding"> = [
+  "buy",
+  "let_go",
+  "still_deciding",
 ];
 
 export default function ItemCard({ item }: { item: Item }) {
-  const revisitText = formatRevisit(item.revisit_at);
+  const t = useT();
+  const revisit = revisitInfo(item.revisit_at);
+  const revisitText = revisit ? t(revisit.key, revisit.vars) : null;
   // "Deciding" means null or still_deciding. Show only the states the user can
   // switch TO (never the current one): a still-deciding card shows just Buy and
   // Let go; a decided card shows the other option plus a way back to deciding.
-  const isDecided = item.decision === "buy" || item.decision === "let_go";
   const current = item.decision ?? "still_deciding";
-  const options = choices.filter((c) => c.value !== current);
+  const options = choices.filter((value) => value !== current);
 
   return (
     <Paper
@@ -74,7 +77,7 @@ export default function ItemCard({ item }: { item: Item }) {
               deciding list looks consistent and calm. */}
           {item.decision === "buy" || item.decision === "let_go" ? (
             <Chip
-              label={decisionLabels[item.decision]}
+              label={t(`card.decision.${item.decision}` as TranslationKey)}
               color={decisionColors[item.decision]}
               size="small"
             />
@@ -83,7 +86,7 @@ export default function ItemCard({ item }: { item: Item }) {
 
         {item.link ? (
           <MuiLink href={item.link} target="_blank" rel="noopener noreferrer">
-            View item ↗
+            {t("card.viewItem")}
           </MuiLink>
         ) : null}
 
@@ -101,30 +104,27 @@ export default function ItemCard({ item }: { item: Item }) {
 
         {/* US-3.1 — choose/change a decision. The clicked button submits its value. */}
         <Box>
-          <Typography variant="caption" color="text.secondary">
-            {isDecided ? "Change to" : "Decide"}
-          </Typography>
-          <Stack direction="row" spacing={1} sx={{ mt: 0.5, flexWrap: "wrap", gap: 1 }}>
-            {options.map((c) => (
-              <form action={setDecision} key={c.value}>
+          <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap", gap: 1 }}>
+            {options.map((value) => (
+              <form action={setDecision} key={value}>
                 <input type="hidden" name="id" value={item.id} />
-                <input type="hidden" name="decision" value={c.value ?? ""} />
+                <input type="hidden" name="decision" value={value} />
                 <Button
                   type="submit"
                   size="small"
                   variant="outlined"
                   color={
-                    c.value === "still_deciding"
+                    value === "still_deciding"
                       ? "inherit"
-                      : decisionColors[c.value as "buy" | "let_go"]
+                      : decisionColors[value as "buy" | "let_go"]
                   }
                   sx={
-                    c.value === "still_deciding"
+                    value === "still_deciding"
                       ? { color: "text.secondary", borderColor: "divider" }
                       : undefined
                   }
                 >
-                  {c.label}
+                  {t(`card.decision.${value}` as TranslationKey)}
                 </Button>
               </form>
             ))}
@@ -135,7 +135,7 @@ export default function ItemCard({ item }: { item: Item }) {
           <form action={deleteItem}>
             <input type="hidden" name="id" value={item.id} />
             <Button type="submit" size="small" color="inherit" sx={{ color: "text.secondary" }}>
-              Remove
+              {t("card.remove")}
             </Button>
           </form>
         </Box>
