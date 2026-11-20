@@ -12,10 +12,12 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogActions from "@mui/material/DialogActions";
 import { deleteAllItems, type DeleteAllState } from "./actions";
+import { useT } from "@/i18n/LanguageProvider";
 
 const initialState: DeleteAllState = {};
 
 export default function DangerZone({ hasItems }: { hasItems: boolean }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [state, formAction, pending] = useActionState(
     deleteAllItems,
@@ -31,10 +33,10 @@ export default function DangerZone({ hasItems }: { hasItems: boolean }) {
     <Box sx={{ mt: 6 }}>
       <Divider sx={{ mb: 2 }} />
       <Typography variant="subtitle2" component="h2">
-        Delete my data
+        {t("danger.heading")}
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, mb: 2 }}>
-        Remove everything you&apos;ve parked. This can&apos;t be undone.
+        {t("danger.desc")}
       </Typography>
 
       {state.error ? (
@@ -49,7 +51,7 @@ export default function DangerZone({ hasItems }: { hasItems: boolean }) {
         onClick={() => setOpen(true)}
         disabled={!hasItems}
       >
-        Delete all my data
+        {t("danger.button")}
       </Button>
       {!hasItems ? (
         <Typography
@@ -57,7 +59,7 @@ export default function DangerZone({ hasItems }: { hasItems: boolean }) {
           color="text.secondary"
           sx={{ display: "block", mt: 1 }}
         >
-          Nothing to delete yet.
+          {t("danger.nothing")}
         </Typography>
       ) : null}
 
@@ -67,11 +69,10 @@ export default function DangerZone({ hasItems }: { hasItems: boolean }) {
         aria-labelledby="delete-all-title"
         aria-describedby="delete-all-desc"
       >
-        <DialogTitle id="delete-all-title">Delete all your data?</DialogTitle>
+        <DialogTitle id="delete-all-title">{t("danger.dialog.title")}</DialogTitle>
         <DialogContent>
           <DialogContentText id="delete-all-desc">
-            This permanently removes every item you&apos;ve parked, along with
-            its notes and decisions. This action can&apos;t be undone.
+            {t("danger.dialog.body")}
           </DialogContentText>
           {state.error ? (
             <Alert severity="error" sx={{ mt: 2 }}>
@@ -81,7 +82,7 @@ export default function DangerZone({ hasItems }: { hasItems: boolean }) {
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={() => setOpen(false)} disabled={pending}>
-            Cancel
+            {t("danger.dialog.cancel")}
           </Button>
           {/* Submitting runs the server action; it re-checks auth and ownership. */}
           <form action={formAction}>
@@ -91,7 +92,7 @@ export default function DangerZone({ hasItems }: { hasItems: boolean }) {
               color="error"
               disabled={pending}
             >
-              {pending ? "Deleting…" : "Delete everything"}
+              {pending ? t("danger.dialog.deleting") : t("danger.dialog.confirm")}
             </Button>
           </form>
         </DialogActions>

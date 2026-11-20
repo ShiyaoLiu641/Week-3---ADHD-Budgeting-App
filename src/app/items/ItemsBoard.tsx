@@ -7,17 +7,19 @@ import Tab from "@mui/material/Tab";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import ItemCard, { type Item } from "./ItemCard";
+import { useT } from "@/i18n/LanguageProvider";
+import { type TranslationKey } from "@/i18n/dictionary";
 
 // The four filters. "all" shows everything; the others match a decision.
 // "Still deciding" is the default so the home view shows what still needs
 // attention — and hides items the user has already let go of.
 type Filter = "still_deciding" | "buy" | "let_go" | "all";
 
-const TABS: { value: Filter; label: string }[] = [
-  { value: "still_deciding", label: "Still deciding" },
-  { value: "buy", label: "Buy" },
-  { value: "let_go", label: "Let go" },
-  { value: "all", label: "All" },
+const TABS: { value: Filter; labelKey: TranslationKey }[] = [
+  { value: "still_deciding", labelKey: "tab.still_deciding" },
+  { value: "buy", labelKey: "tab.buy" },
+  { value: "let_go", labelKey: "tab.let_go" },
+  { value: "all", labelKey: "tab.all" },
 ];
 
 // Decide whether one item belongs in the current tab.
@@ -31,6 +33,7 @@ function matches(item: Item, filter: Filter): boolean {
 }
 
 export default function ItemsBoard({ items }: { items: Item[] }) {
+  const t = useT();
   // Which tab is active. Starts on "Still deciding".
   const [filter, setFilter] = useState<Filter>("still_deciding");
 
@@ -48,7 +51,7 @@ export default function ItemsBoard({ items }: { items: Item[] }) {
         sx={{ mb: 3, borderBottom: 1, borderColor: "divider" }}
       >
         {TABS.map((tab) => (
-          <Tab key={tab.value} label={tab.label} value={tab.value} />
+          <Tab key={tab.value} label={t(tab.labelKey)} value={tab.value} />
         ))}
       </Tabs>
 
@@ -63,7 +66,7 @@ export default function ItemsBoard({ items }: { items: Item[] }) {
           }}
         >
           <Typography variant="body2" color="text.secondary">
-            Nothing in this list yet.
+            {t("board.empty")}
           </Typography>
         </Paper>
       ) : (

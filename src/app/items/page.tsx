@@ -10,6 +10,9 @@ import AddItemForm from "./AddItemForm";
 import { type Item } from "./ItemCard";
 import ItemsBoard from "./ItemsBoard";
 import DangerZone from "./DangerZone";
+import { getLang } from "@/i18n/server";
+import { t } from "@/i18n/dictionary";
+import LanguageToggle from "@/i18n/LanguageToggle";
 
 export default async function ItemsPage() {
   const supabase = await createClient();
@@ -28,6 +31,7 @@ export default async function ItemsPage() {
     .order("created_at", { ascending: false });
 
   const list = (items ?? []) as Item[];
+  const lang = await getLang();
 
   return (
     <Container maxWidth="md">
@@ -37,19 +41,26 @@ export default async function ItemsPage() {
           sx={{ justifyContent: "space-between", alignItems: "center", mb: 1 }}
         >
           <Typography variant="h4" component="h1">
-            My list
+            Park &amp; Revisit
           </Typography>
-          <form action="/auth/signout" method="post">
-            <Button type="submit" variant="text" size="small">
-              Log out
-            </Button>
-          </form>
+          <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+            <LanguageToggle />
+            <form action="/auth/signout" method="post">
+              <Button type="submit" variant="text" size="small">
+                {t(lang, "items.logout")}
+              </Button>
+            </form>
+          </Stack>
         </Stack>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
-          Signed in as {user.email}
+          {t(lang, "items.signedInAs", { email: user.email ?? "" })}
         </Typography>
 
         <AddItemForm />
+
+        <Typography variant="h5" component="h2" sx={{ mt: 4, mb: 2 }}>
+          {t(lang, "items.title")}
+        </Typography>
 
         {list.length === 0 ? (
           <Paper
@@ -62,11 +73,10 @@ export default async function ItemsPage() {
             }}
           >
             <Typography variant="h6" component="p" gutterBottom>
-              Nothing parked yet 🌱
+              {t(lang, "items.empty.title")}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Next time you feel the urge to buy, park it above instead. Come
-              back whenever you like — no rush, no guilt.
+              {t(lang, "items.empty.body")}
             </Typography>
           </Paper>
         ) : (

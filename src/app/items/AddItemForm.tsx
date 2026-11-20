@@ -11,18 +11,21 @@ import Collapse from "@mui/material/Collapse";
 import Alert from "@mui/material/Alert";
 import Typography from "@mui/material/Typography";
 import { createItem, type ItemFormState } from "./actions";
+import { useT } from "@/i18n/LanguageProvider";
+import { type TranslationKey } from "@/i18n/dictionary";
 
 const initialState: ItemFormState = {};
 
-const waitOptions = [
-  { value: "", label: "No set time" },
-  { value: "1", label: "1 day" },
-  { value: "3", label: "3 days" },
-  { value: "7", label: "1 week" },
-  { value: "date", label: "Choose a specific date" },
+const waitOptions: { value: string; labelKey: TranslationKey }[] = [
+  { value: "", labelKey: "form.revisit.none" },
+  { value: "1", labelKey: "form.revisit.1day" },
+  { value: "3", labelKey: "form.revisit.3days" },
+  { value: "7", labelKey: "form.revisit.1week" },
+  { value: "date", labelKey: "form.revisit.date" },
 ];
 
 export default function AddItemForm() {
+  const t = useT();
   const [state, formAction, pending] = useActionState(createItem, initialState);
   // Whether the form is expanded. Starts collapsed to keep the list clean.
   const [open, setOpen] = useState(false);
@@ -53,7 +56,7 @@ export default function AddItemForm() {
         sx={{ justifyContent: "space-between", alignItems: "center" }}
       >
         <Typography variant="h6" component="h2">
-          Park an item
+          {t("form.heading")}
         </Typography>
         <Button
           onClick={() => setOpen((prev) => !prev)}
@@ -61,7 +64,7 @@ export default function AddItemForm() {
           aria-controls="park-item-form"
           endIcon={<span aria-hidden="true">{open ? "▲" : "▼"}</span>}
         >
-          {open ? "Close" : "Add"}
+          {open ? t("form.toggle.close") : t("form.toggle.add")}
         </Button>
       </Stack>
 
@@ -75,31 +78,31 @@ export default function AddItemForm() {
         <Box component="form" ref={formRef} action={formAction} sx={{ mt: 2 }}>
           <Stack spacing={2}>
             <TextField
-              label="What are you tempted to buy?"
+              label={t("form.name.label")}
               name="name"
               required
               fullWidth
               autoComplete="off"
-              placeholder="e.g. a second pair of running shoes"
+              placeholder={t("form.name.placeholder")}
             />
             <TextField
-              label="Link (optional)"
+              label={t("form.link.label")}
               name="link"
               fullWidth
               autoComplete="off"
-              placeholder="Paste the product link"
+              placeholder={t("form.link.placeholder")}
             />
             <TextField
-              label="Note (optional)"
+              label={t("form.note.label")}
               name="note"
               fullWidth
               multiline
               minRows={2}
               autoComplete="off"
-              placeholder="Why do you want it? What would it replace?"
+              placeholder={t("form.note.placeholder")}
             />
             <TextField
-              label="Revisit after (optional)"
+              label={t("form.revisit.label")}
               name="revisitDays"
               select
               fullWidth
@@ -108,14 +111,14 @@ export default function AddItemForm() {
             >
               {waitOptions.map((o) => (
                 <MenuItem key={o.value} value={o.value}>
-                  {o.label}
+                  {t(o.labelKey)}
                 </MenuItem>
               ))}
             </TextField>
 
             {revisit === "date" ? (
               <TextField
-                label="Revisit date"
+                label={t("form.date.label")}
                 name="revisitDate"
                 type="date"
                 fullWidth
@@ -132,7 +135,7 @@ export default function AddItemForm() {
               size="large"
               disabled={pending}
             >
-              {pending ? "Saving…" : "Park it"}
+              {pending ? t("form.submit.saving") : t("form.submit")}
             </Button>
           </Stack>
         </Box>
